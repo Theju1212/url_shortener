@@ -10,6 +10,9 @@ app.config['SECRET_KEY'] = 'supersecretkey'  # Needed for flash messages
 
 db = SQLAlchemy(app)
 
+# Base URL for deployment
+RENDER_URL = "https://url-shortener-brtq.onrender.com"  # Change this to your Render URL
+
 # Database Model
 class URL(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,7 +38,8 @@ def home():
         # Prevent duplicate long URLs
         existing_url = URL.query.filter_by(long_url=long_url).first()
         if existing_url:
-            short_url = f"http://127.0.0.1:5000/{existing_url.short_code}"
+            short_url = f"{RENDER_URL}/{existing_url.short_code}"
+            
             flash(f"Shortened URL already exists: <a href='{short_url}' target='_blank'>{short_url}</a>", "info")
             return render_template("index.html", short_url=short_url)
 
@@ -53,7 +57,7 @@ def home():
         db.session.add(new_url)
         db.session.commit()
 
-        short_url = f"http://127.0.0.1:5000/{short_code}"
+        short_url = f"{RENDER_URL}/{short_code}"
         flash(f"Shortened URL: <a href='{short_url}' target='_blank'>{short_url}</a>", "success")
         return render_template("index.html", short_url=short_url)
 
